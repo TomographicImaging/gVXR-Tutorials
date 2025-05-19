@@ -22,8 +22,6 @@ import argparse, sys
 import logging
 
 
-use_scintillation = False
-
 
 def getData(data_path):
     if not os.path.exists(data_path):
@@ -67,31 +65,38 @@ def initGVXR():
     gvxr.setDetectorPixelSize(pixel_size_in_mm[0], pixel_size_in_mm[1], "mm");
 
     if use_scintillation:
-        gvxr.setScintillator("Gd2O2S DRZ-Plus", 0.21, "mm")
+        gvxr.setScintillator("Gd2O2S DRZ-Plus", scintillator_thickness_in_mm, "mm")
 
-    gvxr.makeCuboid("waterbox", *waterbox_size_in_cm, "cm")
-    gvxr.translateNode("waterbox", *waterbox_translation_in_cm, "cm")
-    gvxr.addPolygonMeshAsInnerSurface("waterbox")
-    gvxr.setCompound("waterbox", "H2O")
-    gvxr.setDensity("waterbox", 1, "g/cm3")
+    gvxr.makeCuboid("Ti90Al6V4Box", *Ti90Al6V4Box_size_in_cm, "cm")
+    gvxr.translateNode("Ti90Al6V4Box", *Ti90Al6V4Box_translation_in_cm, "cm")
+    gvxr.addPolygonMeshAsInnerSurface("Ti90Al6V4Box")
+    gvxr.setMixture("Ti90Al6V4Box", "Ti90Al6V4")
+    gvxr.setDensity("Ti90Al6V4Box", 4.43, "g/cm3")
 
-    gvxr.makeCuboid("rubberbox", *rubberbox_size_in_cm, "cm")
-    gvxr.translateNode("rubberbox", *rubberbox_translation_in_cm, "cm")
-    gvxr.addPolygonMeshAsInnerSurface("rubberbox")
-    gvxr.setMixture("rubberbox", [1, 6], [0.118371, 0.881629])
-    gvxr.setDensity("rubberbox", 0.92, "g/cm3")
+    gvxr.makeCuboid("BrassBox", *BrassBox_size_in_cm, "cm")
+    gvxr.translateNode("BrassBox", *BrassBox_translation_in_cm, "cm")
+    gvxr.addPolygonMeshAsInnerSurface("BrassBox")
+    gvxr.setMixture("BrassBox", ["Cu", "Zn"], [0.666666, 0.333334])
+    gvxr.setDensity("BrassBox", 8.565, "g/cm3")
 
-    gvxr.makeCuboid("teflonbox", *teflonbox_size_in_cm, "cm")
-    gvxr.translateNode("teflonbox", *teflonbox_translation_in_cm, "cm")
-    gvxr.addPolygonMeshAsInnerSurface("teflonbox")
-    gvxr.setMixture("teflonbox", [6, 9], [0.240183, 0.759817])
-    gvxr.setDensity("teflonbox", 2.2, "g/cm3")
+    gvxr.makeCuboid("WhiteMetalBox", *WhiteMetalBox_size_in_cm, "cm")
+    gvxr.translateNode("WhiteMetalBox", *WhiteMetalBox_translation_in_cm, "cm")
+    gvxr.addPolygonMeshAsInnerSurface("WhiteMetalBox")
+    gvxr.setMixture("WhiteMetalBox", ["Sn", "Sb", "Cu", "Pb"], [0.8, 0.11, 0.03, 0.06])
+    gvxr.setDensity("WhiteMetalBox", 7.40, "g/cm3")
 
-    gvxr.makeCuboid("plexiglassbox", *plexiglassbox_size_in_cm, "cm")
-    gvxr.translateNode("plexiglassbox", *plexiglassbox_translation_in_cm, "cm")
-    gvxr.addPolygonMeshAsInnerSurface("plexiglassbox")
-    gvxr.setMixture("plexiglassbox", [1, 6, 8], [0.080538, 0.599848, 0.319614])
-    gvxr.setDensity("plexiglassbox", 1.19, "g/cm3")
+    gvxr.makeCuboid("CarbonSteelBox", *CarbonSteelBox_size_in_cm, "cm")
+    gvxr.translateNode("CarbonSteelBox", *CarbonSteelBox_translation_in_cm, "cm")
+    gvxr.addPolygonMeshAsInnerSurface("CarbonSteelBox")
+    gvxr.setMixture("CarbonSteelBox", 
+        ["Mn", "C", "S", "P", "Fe"], 
+        [0.0075, 0.00175, 0.00025, 0.0002, 0.9903])
+    gvxr.setDensity("CarbonSteelBox", 7.87, "g/cm3")
+
+    gvxr.makeCuboid("aluminiumbox", *aluminiumbox_size_in_cm, "cm")
+    gvxr.translateNode("aluminiumbox", *aluminiumbox_translation_in_cm, "cm")
+    gvxr.addPolygonMeshAsInnerSurface("aluminiumbox")
+    gvxr.setElement("aluminiumbox", "Al")
 
     return spectrum
 
@@ -118,7 +123,7 @@ def initGate(spectrum, output_dir, fname):
     sim.progress_bar = True
     sim.output_dir = output_dir
 
-    sim.volume_manager.add_material_database(data_path / "ScintillatorMaterial.db")
+    sim.volume_manager.add_material_database(data_path / "GateMaterials.db")
 
     sim.physics_manager.physics_list_name = "G4EmStandardPhysics_option4"
 
@@ -138,7 +143,8 @@ def initGate(spectrum, output_dir, fname):
 
     # CBCT detector plane
     detector_plane = sim.add_volume("Box", "CBCT_detector_plane")
-    detector_plane.size = [409.6 * mm, 409.6 * mm, 0.21 * mm]
+    detector_plane.size = [409.6 * mm, 409.6 * mm, scintillator_thickness_in_mm * mm]
+
     # detector_plane.size = [409.6 * mm, 409.6 * mm, 0.6 * mm]
     if use_scintillation:
         detector_plane.material = "Gd2O2S-DRZ-Plus"
@@ -183,31 +189,44 @@ def initGate(spectrum, output_dir, fname):
     return sim
 
 
-def addPhantom(sim):
-    waterbox = sim.add_volume("Box", "waterbox")
-    waterbox.size = waterbox_size_in_cm * cm
-    waterbox.translation = waterbox_translation_in_cm * cm
-    waterbox.material = "G4_WATER"
-    waterbox.color = [0, 0, 1, 1]  # this is RGBa (a=alpha=opacity), so blue here
+def addPhantom(sim, use_dummy):
+    Ti90Al6V4Box = sim.add_volume("Box", "Ti90Al6V4Box")
+    Ti90Al6V4Box.size = Ti90Al6V4Box_size_in_cm * cm
+    Ti90Al6V4Box.translation = Ti90Al6V4Box_translation_in_cm * cm
+    Ti90Al6V4Box.color = [0, 0, 1, 1]  # this is RGBa (a=alpha=opacity), so blue here
 
-    rubberbox = sim.add_volume("Box", "rubberbox")
-    rubberbox.size = rubberbox_size_in_cm * cm
-    rubberbox.translation = rubberbox_translation_in_cm * cm
-    rubberbox.material = "G4_RUBBER_NATURAL"
-    rubberbox.color = [0, 0, 1, 1]  # this is RGBa (a=alpha=opacity), so blue here
+    BrassBox = sim.add_volume("Box", "BrassBox")
+    BrassBox.size = BrassBox_size_in_cm * cm
+    BrassBox.translation = BrassBox_translation_in_cm * cm
+    BrassBox.color = [0, 0, 1, 1]  # this is RGBa (a=alpha=opacity), so blue here
 
-    teflonbox = sim.add_volume("Box", "teflonbox")
-    teflonbox.size = teflonbox_size_in_cm * cm
-    teflonbox.translation = teflonbox_translation_in_cm * cm
-    teflonbox.material = "G4_TEFLON"
-    teflonbox.color = [0, 0, 1, 1]  # this is RGBa (a=alpha=opacity), so blue here
+    WhiteMetalBox = sim.add_volume("Box", "WhiteMetalBox")
+    WhiteMetalBox.size = WhiteMetalBox_size_in_cm * cm
+    WhiteMetalBox.translation = WhiteMetalBox_translation_in_cm * cm
+    WhiteMetalBox.color = [0, 0, 1, 1]  # this is RGBa (a=alpha=opacity), so blue here
 
-    plexiglassbox = sim.add_volume("Box", "plexiglassbox")
-    plexiglassbox.size = plexiglassbox_size_in_cm * cm
-    plexiglassbox.translation = plexiglassbox_translation_in_cm * cm
-    plexiglassbox.material = "G4_PLEXIGLASS"
-    plexiglassbox.color = [0, 0, 1, 1]  # this is RGBa (a=alpha=opacity), so blue here
+    CarbonSteelBox = sim.add_volume("Box", "CarbonSteelBox")
+    CarbonSteelBox.size = CarbonSteelBox_size_in_cm * cm
+    CarbonSteelBox.translation = CarbonSteelBox_translation_in_cm * cm
+    CarbonSteelBox.color = [0, 0, 1, 1]  # this is RGBa (a=alpha=opacity), so blue here
 
+    aluminiumbox = sim.add_volume("Box", "aluminiumbox")
+    aluminiumbox.size = aluminiumbox_size_in_cm * cm
+    aluminiumbox.translation = aluminiumbox_translation_in_cm * cm
+    aluminiumbox.color = [0, 0, 1, 1]  # this is RGBa (a=alpha=opacity), so blue here
+
+    if not use_dummy:
+        Ti90Al6V4Box.material = "Ti6Al4V"
+        BrassBox.material = "Brass"
+        WhiteMetalBox.material = "WhiteMetal"
+        CarbonSteelBox.material = "CarbonSteel"
+        aluminiumbox.material = "Aluminium"
+    else:
+        Ti90Al6V4Box.material = "Vacuum"
+        BrassBox.material = "Vacuum"
+        WhiteMetalBox.material = "Vacuum"
+        CarbonSteelBox.material = "Vacuum"
+        aluminiumbox.material = "Vacuum"
 
 
 # this first line is required at the beginning of all scripts
@@ -216,6 +235,13 @@ if __name__ == "__main__":
     try:
         parser=argparse.ArgumentParser(description="Compare simulations performed with Gate and gVXR")
         parser.add_argument("--particles", type=int, default=5000000, help="Total number of particles")
+        parser.add_argument("--SOD", type=float, default=1000, help="source-object distance in mm")
+        parser.add_argument("--SDD", type=float, default=1000+536, help="source-detector distance in mm")
+
+        parser.add_argument('--scintillation', action='store_true', help="Use scintillation")
+        parser.add_argument('--no-scintillation', dest='scintillation', action='store_false', help="Do not use scintillation")
+        parser.set_defaults(scintillation=True)
+
         args=parser.parse_args()
 
         import os
@@ -272,21 +298,29 @@ if __name__ == "__main__":
 
 
 
-        gantry_position_in_mm   = np.array([0, 0, 1060])
-        source_focus_point_position_in_mm   = np.array([0, 0, gantry_position_in_mm[2] - 60])
-        detector_position_in_mm = np.array([0, 0, -536])
+        SOD_in_mm = args.SOD
+        SDD_in_mm = args.SDD
+        ODD_in_mm = SDD_in_mm - SOD_in_mm
+        
 
-        waterbox_size_in_cm = np.array([7.0, 7.0, 7.0])
-        waterbox_translation_in_cm = np.array([4.0, 4.0, 4.0])
+        source_focus_point_position_in_mm   = np.array([0, 0, SOD_in_mm])
+        gantry_position_in_mm   = np.array([0, 0, SOD_in_mm + 60])
+        detector_position_in_mm = np.array([0, 0, -ODD_in_mm])
 
-        rubberbox_size_in_cm = np.array([7.0, 7.0, 7.0])
-        rubberbox_translation_in_cm = np.array([-4.0, 4.0, 4.0])
+        Ti90Al6V4Box_size_in_cm = np.array([7.0, 7.0, 0.5])
+        Ti90Al6V4Box_translation_in_cm = np.array([4.0, 4.0, 0.0])
 
-        teflonbox_size_in_cm = np.array([7.0, 7.0, 7.0])
-        teflonbox_translation_in_cm = np.array([4.0, -4.0, 4.0])
+        BrassBox_size_in_cm = np.array([7.0, 7.0, 0.4])
+        BrassBox_translation_in_cm = np.array([-4.0, 4.0, 0.0])
 
-        plexiglassbox_size_in_cm = np.array([7.0, 7.0, 7.0])
-        plexiglassbox_translation_in_cm = np.array([-4.0, -4.0, 4.0])
+        WhiteMetalBox_size_in_cm = np.array([7.0, 7.0, 0.3])
+        WhiteMetalBox_translation_in_cm = np.array([4.0, -4.0, 0.0])
+
+        CarbonSteelBox_size_in_cm = np.array([7.0, 7.0, 0.2])
+        CarbonSteelBox_translation_in_cm = np.array([-4.0, -4.0, 0.0])
+
+        aluminiumbox_size_in_cm = np.array([20.0, 20.0, 1.5])
+        aluminiumbox_translation_in_cm = np.array([0.0, 0.0, -5.0])
 
         source_size_in_mm = np.array([16, 16, 1e-6])
 
@@ -300,20 +334,33 @@ if __name__ == "__main__":
 
         pixel_size_in_mm = np.array([detector_size_in_mm[0] / detector_cols, detector_size_in_mm[1] / detector_rows, 10])
 
+        use_scintillation = args.scintillation
+
+        if use_scintillation:
+            scintillator_thickness_in_mm = 0.21
+        else:
+            scintillator_thickness_in_mm = 1e-6
+
         # energy_in_keV = 60
         total_number_of_photons = args.particles
         number_of_photons_per_pixel = max(1,round(total_number_of_photons / (detector_cols * detector_rows)))
 
-        output_dir = "./output"
+        if use_scintillation:
+            output_dir = "./output_data/Gate_gVXR-comparison/with_scintillation"
+        else:
+            output_dir = "./output_data/Gate_gVXR-comparison/without_scintillation"
+
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
+
         gate_flat_image_fname = "gate_flat_image-" + str(total_number_of_photons) + "photons.mha"
         gate_attenuation_image_fname = "gate_attenuation_image-" + str(total_number_of_photons) + "photons.mha"
         gvxr_flat_image_fname = "gvxr_flat_image-" + str(total_number_of_photons) + "photons.mha"
         gvxr_attenuation_image_fname = "gvxr_attenuation_image-" + str(total_number_of_photons) + "photons.mha"
-        plot_fname = "compare-" + str(total_number_of_photons) + "photons"
 
 
 
-        data_path = Path("data")
+        data_path = Path("../data")
         phantom_volume_file_path = getData(data_path)
 
         spectrum = initGVXR()
@@ -321,7 +368,7 @@ if __name__ == "__main__":
         gvxr_attenuation_image, gvxr_flat_image = runGVXR()
         gvxr_stop_time = time()
         # gvxr.renderLoop()
-
+        # exit()
         gvxr_flat_image[gvxr_flat_image<1e-6] = 1e-6
 
         sitk_image = sitk.GetImageFromArray(gvxr_flat_image.astype(np.single))
@@ -331,12 +378,13 @@ if __name__ == "__main__":
         sitk.WriteImage(sitk_image, os.path.join(output_dir, gvxr_attenuation_image_fname))
 
         sim = initGate(spectrum, output_dir, gate_attenuation_image_fname)
-        addPhantom(sim)
+        addPhantom(sim, use_dummy=False)
         gate_start_time1 = time()
         sim.run(True)
         gate_stop_time1 = time()
 
         sim = initGate(spectrum, output_dir, gate_flat_image_fname)
+        addPhantom(sim, use_dummy=True)
         gate_start_time0 = time()
         sim.run(True)
         gate_stop_time0 = time()
@@ -443,9 +491,14 @@ if __name__ == "__main__":
             gate_attenuation_image = sitk.GetArrayFromImage(sitk.ReadImage(os.path.join(output_dir, gate_attenuation_image_fname)))[0]
             
 
+            # plt.figure()
+            # plt.imshow(gvxr_attenuation_image[0:17])
+            # plt.show()
+
+            plot_fname = "compare-" + str(total_number_of_photons) + "photons"
             plt.figure(figsize= (20,10))
 
-            plt.suptitle("Image simulated with Gate and gVirtualXRay using " + str(total_number_of_photons) + " photons in total")#, y=1.02)
+            plt.suptitle("Image simulated with Gate and gVirtualXRay using\n" + str(total_number_of_photons) + " photons in total")#, y=1.02)
 
             plt.subplot(221)
 
@@ -453,7 +506,7 @@ if __name__ == "__main__":
 
             gate_normalised_image = gate_attenuation_image / gate_flat_image
             gate_normalised_image[gate_attenuation_image < 1e-4] = 1e-4
-
+            # gate_normalised_image = gate_attenuation_image / np.mean(gate_attenuation_image[0:17])
 
             plt.imshow(gate_normalised_image, cmap="gray", vmin=0, vmax=1)
             plt.plot([0, gate_normalised_image.shape[1]-1], [0, gate_normalised_image.shape[0]-1], color="blue")#, linestyle='dashed')
@@ -464,6 +517,8 @@ if __name__ == "__main__":
 
             plt.subplot(222)
             gvxr_normalised_image = gvxr_attenuation_image / gvxr_flat_image
+            # gvxr_normalised_image = gvxr_attenuation_image / np.mean(gvxr_attenuation_image[0:17])
+
             plt.imshow(gvxr_normalised_image, cmap="gray", vmin=0, vmax=1)
             plt.plot([0, gvxr_normalised_image.shape[1]-1], [0, gvxr_normalised_image.shape[0]-1], color="cyan")#, linestyle='dotted')
             plt.plot([gvxr_normalised_image.shape[1]-1, 0], [0, gvxr_normalised_image.shape[0]-1], color="magenta")#, linestyle='dashed')
@@ -489,8 +544,8 @@ if __name__ == "__main__":
             plt.tight_layout()
             plt.savefig(os.path.join(output_dir, plot_fname + ".pdf"))
             plt.savefig(os.path.join(output_dir, plot_fname + ".png"))
-            plt.close()
-            plt.show()
+            # plt.close()
+            # plt.show()
 
             plot_fname = os.path.join(output_dir, "spectrum-" + str(kvp) + "kV-filtration_" + "{:.2f}".format(filtration[0][1]) + filtration[0][2] + "_of_" + filtration[0][0])
             plt.figure(figsize= (20,10))
@@ -507,33 +562,34 @@ if __name__ == "__main__":
 
 
 
-            plot_fname = os.path.join(output_dir, "energy-response-" + "{:.2f}".format(gvxr.getScintillatorThickness("um")) + "um-of-" + gvxr.getScintillatorMaterial())
             energy_response = np.array(gvxr.getEnergyResponse("keV"))
-            print(energy_response.shape)
-            # plt.title("Beam spectrum")
-            plt.figure(figsize= (15,10))
-            plt.scatter(energy_response[:,0], energy_response[:,1], label="gVXR", marker="x")
-            plt.xlabel('Incident energy in keV')
-            plt.ylabel('Relative detector energy response')
 
-            mat = "Gd2O2S"
-            rho = 4.76
-            thickness = 0.021 #cm
+            if energy_response.shape[0]:
+                plot_fname = os.path.join(output_dir, "energy-response-" + "{:.2f}".format(gvxr.getScintillatorThickness("um")) + "um-of-" + gvxr.getScintillatorMaterial())
+                # plt.title("Beam spectrum")
+                plt.figure(figsize= (15,10))
+                plt.scatter(energy_response[:,0], energy_response[:,1], label="gVXR", marker="x")
+                plt.xlabel('Incident energy in keV')
+                plt.ylabel('Relative detector energy response')
 
-            energy_range = np.logspace(0., 2.48, num=1000)
-            response = [E*(xrl.CS_Energy_CP(mat, E)/xrl.CS_Total_CP(mat, E))*(1.-np.exp(-xrl.CS_Total_CP(mat, E) * float(rho) * thickness)) for E in energy_range]
-            plt.plot(energy_range, energy_range,color="red",linewidth=1.,linestyle="--")
-            plt.plot(energy_range, response,color="blue",linewidth=2.,linestyle="-", label="JML's code")
-            plt.xlim(0.,300.)
-            plt.ylim(0.,40.)
+                mat = "Gd2O2S"
+                rho = 4.76
+                thickness = scintillator_thickness_in_mm / 10.0 #cm
 
-            plt.legend()
-            plt.tight_layout()
-            plt.savefig(plot_fname + ".pdf")
-            plt.savefig(plot_fname + ".png")
-            plt.close()
-            # plt.show()
-            # exit()
+                energy_range = np.logspace(0., 2.48, num=1000)
+                response = [E*(xrl.CS_Energy_CP(mat, E)/xrl.CS_Total_CP(mat, E))*(1.-np.exp(-xrl.CS_Total_CP(mat, E) * float(rho) * thickness)) for E in energy_range]
+                plt.plot(energy_range, energy_range,color="red",linewidth=1.,linestyle="--")
+                plt.plot(energy_range, response,color="blue",linewidth=2.,linestyle="-", label="JML's code")
+                plt.xlim(0.,300.)
+                plt.ylim(0.,40.)
+
+                plt.legend()
+                plt.tight_layout()
+                plt.savefig(plot_fname + ".pdf")
+                plt.savefig(plot_fname + ".png")
+                plt.close()
+                # plt.show()
+                # exit()
 
 
 
