@@ -20,7 +20,9 @@ dependencies:
     - tigre
     - progressbar
     - k3d
+    - python-dotenv
     - pip
     - pip:
+        - opengate
         - viewscad
         - gvxr>=2.0.10

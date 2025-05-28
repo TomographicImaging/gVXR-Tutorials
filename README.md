@@ -17,6 +17,8 @@
     - [Multi-material anatomical example](notebooks/multi_material-lungman_phantom.ipynb)
     <!-- - [Magnification](notebooks/magnification.ipynb) -->
     - [Polychromtic X-ray tube spectra](notebooks/polychromatism.ipynb)
+    - [Scintillation](notebooks/scintillation.ipynb)
+    - [Monte Carlo vs. determinist](notebooks/Gate_gVXR-comparison.ipynb)
     - [Ideal CT scan](notebooks/multi_material-CT_scan.ipynb)
     - [Low dose CT scan](notebooks/multi_material-CT_scan-low_dose.ipynb)
     - Creating, combining and moving 3D objects
@@ -62,6 +64,7 @@ pip install matplotlib viewscad xpecgen spekpy SimpleITK k3d
 - [Polychromtic X-ray tube spectra](notebooks/polychromatism.ipynb): In this notebook we explore how to specify polychromtic X-ray tube spectra, without and with filtration. We also shows how to plot the spectrum. <a href="https://colab.research.google.com/github/TomographicImaging/gVXR-Tutorials/blob/main/notebooks/polychromatism.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
 - [Scintillation](notebooks/scintillation.ipynb): In this notebook we explore how to create a detector with a scintillator.
 We also shows how to plot the corresponding energy response. <a href="https://colab.research.google.com/github/TomographicImaging/gVXR-Tutorials/blob/main/notebooks/scintillation.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
+- [Monte Carlo vs. determinist](notebooks/Gate_gVXR-comparison.ipynb): In this notebook, we run a simulation with gVXR and the corresponding one with Gate. Both simulations use the same number of emitted photons. This is to make sure the noise is well callibrated in gVXR. <a href="https://colab.research.google.com/github/TomographicImaging/gVXR-Tutorials/blob/main/notebooks/Gate_gVXR-comparison.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
 - Ideal CT scan: Simulate a CT scan acquisition with gVXR and reconstruct the CT volume with CIL. As a bonus, we explore how to visualise the data in 2D using CIL's widgets, and also using 3D volume rendering with K3D. 
     - [Saving the projections on the disk prior to the reconstruction](notebooks/multi_material-CT_scan-disk.ipynb): <a href="https://colab.research.google.com/github/TomographicImaging/gVXR-Tutorials/blob/main/notebooks/multi_material-CT_scan-disk.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
     - [Saving the projections in the RAM prior to the reconstruction](notebooks/multi_material-CT_scan-RAM.ipynb): <a href="https://colab.research.google.com/github/TomographicImaging/gVXR-Tutorials/blob/main/notebooks/multi_material-CT_scan-RAM.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
