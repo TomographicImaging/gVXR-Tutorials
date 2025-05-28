@@ -72,18 +72,24 @@ def initGVXR():
     gvxr.addPolygonMeshAsInnerSurface("Ti90Al6V4Box")
     gvxr.setMixture("Ti90Al6V4Box", "Ti90Al6V4")
     gvxr.setDensity("Ti90Al6V4Box", 4.43, "g/cm3")
+    gvxr.setColour("Ti90Al6V4Box", 135.0 / 255.0, 134.0 / 255.0, 129.0 / 255.0, 1.0)
+    gvxr.setShininess("Ti90Al6V4Box", 150.0)
 
     gvxr.makeCuboid("BrassBox", *BrassBox_size_in_cm, "cm")
     gvxr.translateNode("BrassBox", *BrassBox_translation_in_cm, "cm")
     gvxr.addPolygonMeshAsInnerSurface("BrassBox")
     gvxr.setMixture("BrassBox", ["Cu", "Zn"], [0.666666, 0.333334])
     gvxr.setDensity("BrassBox", 8.565, "g/cm3")
+    gvxr.setColour("BrassBox", 177.0 / 255.0, 163.0 / 255.0, 66.0 / 255.0, 1.0)
+    gvxr.setShininess("BrassBox", 100.0)
 
-    gvxr.makeCuboid("WhiteMetalBox", *WhiteMetalBox_size_in_cm, "cm")
-    gvxr.translateNode("WhiteMetalBox", *WhiteMetalBox_translation_in_cm, "cm")
-    gvxr.addPolygonMeshAsInnerSurface("WhiteMetalBox")
-    gvxr.setMixture("WhiteMetalBox", ["Sn", "Sb", "Cu", "Pb"], [0.8, 0.11, 0.03, 0.06])
-    gvxr.setDensity("WhiteMetalBox", 7.40, "g/cm3")
+    gvxr.makeCuboid("SiCBox", *SiCBox_size_in_cm, "cm")
+    gvxr.translateNode("SiCBox", *SiCBox_translation_in_cm, "cm")
+    gvxr.addPolygonMeshAsInnerSurface("SiCBox")
+    gvxr.setCompound("SiCBox", "SiC")
+    gvxr.setDensity("SiCBox", 3.16, "g/cm3")
+    gvxr.setColour("SiCBox", 1.0, 1.0, 1.0, 1.0)
+    gvxr.setShininess("SiCBox", 100.0)
 
     gvxr.makeCuboid("CarbonSteelBox", *CarbonSteelBox_size_in_cm, "cm")
     gvxr.translateNode("CarbonSteelBox", *CarbonSteelBox_translation_in_cm, "cm")
@@ -92,21 +98,32 @@ def initGVXR():
         ["Mn", "C", "S", "P", "Fe"], 
         [0.0075, 0.00175, 0.00025, 0.0002, 0.9903])
     gvxr.setDensity("CarbonSteelBox", 7.87, "g/cm3")
+    gvxr.setColour("CarbonSteelBox", 88.0 / 255.0, 94.0 / 255.0, 94.0 / 255.0, 1.0)
+    gvxr.setShininess("CarbonSteelBox", 100.0)
+
 
     gvxr.makeCuboid("aluminiumbox", *aluminiumbox_size_in_cm, "cm")
     gvxr.translateNode("aluminiumbox", *aluminiumbox_translation_in_cm, "cm")
     gvxr.addPolygonMeshAsInnerSurface("aluminiumbox")
     gvxr.setElement("aluminiumbox", "Al")
+    gvxr.setColour("aluminiumbox", 217.0 / 255.0, 218.0 / 255.0, 217.0 / 255.0, 1.0)
+    gvxr.setShininess("aluminiumbox", 150.0)
 
     return spectrum
 
 
 def runGVXR():
     gvxr_attenuation_image = np.array(gvxr.computeXRayImage())
-    gvxr_flat_image = np.array(gvxr.getWhiteImage())
-    return gvxr_attenuation_image, gvxr_flat_image
 
-def initGate(spectrum, output_dir, fname):
+    gvxr_flat_image = np.zeros(gvxr_attenuation_image.shape, dtype=np.single)
+    
+    for i in range(white_images):
+        gvxr_flat_image += np.array(gvxr.getWhiteImage())
+
+    gvxr_flat_image /= white_images
+    return gvxr_attenuation_image, gvxr_flat_image 
+
+def initGate(spectrum):
     sim = gate.Simulation()
 
     sim.g4_verbose = False
@@ -160,11 +177,11 @@ def initGate(spectrum, output_dir, fname):
     else:
         detector_actor = sim.add_actor("FluenceActor", "detector_actor")
     detector_actor.attached_to = detector_plane
-    # detector_actor.output_filename = "cbct.mhd"
-    detector_actor.output_filename = fname
+    # detector_actor.output_filename = fname
     detector_actor.spacing = pixel_size_in_mm * mm
     detector_actor.size = [detector_cols, detector_rows, 1]
-        
+    detector_actor.write_to_disk = False
+
     # physics
     sim.physics_manager.physics_list_name = "G4EmStandardPhysics_option1"
     sim.physics_manager.set_production_cut("world", "all", 10 * mm)
@@ -186,7 +203,7 @@ def initGate(spectrum, output_dir, fname):
     source.direction.focus_point = source_focus_point_position_in_mm * mm
     source.n = total_number_of_photons / sim.number_of_threads
 
-    return sim
+    return sim, detector_actor
 
 
 def addPhantom(sim, use_dummy):
@@ -200,10 +217,10 @@ def addPhantom(sim, use_dummy):
     BrassBox.translation = BrassBox_translation_in_cm * cm
     BrassBox.color = [0, 0, 1, 1]  # this is RGBa (a=alpha=opacity), so blue here
 
-    WhiteMetalBox = sim.add_volume("Box", "WhiteMetalBox")
-    WhiteMetalBox.size = WhiteMetalBox_size_in_cm * cm
-    WhiteMetalBox.translation = WhiteMetalBox_translation_in_cm * cm
-    WhiteMetalBox.color = [0, 0, 1, 1]  # this is RGBa (a=alpha=opacity), so blue here
+    SiCBox = sim.add_volume("Box", "SiCBox")
+    SiCBox.size = SiCBox_size_in_cm * cm
+    SiCBox.translation = SiCBox_translation_in_cm * cm
+    SiCBox.color = [0, 0, 1, 1]  # this is RGBa (a=alpha=opacity), so blue here
 
     CarbonSteelBox = sim.add_volume("Box", "CarbonSteelBox")
     CarbonSteelBox.size = CarbonSteelBox_size_in_cm * cm
@@ -218,13 +235,13 @@ def addPhantom(sim, use_dummy):
     if not use_dummy:
         Ti90Al6V4Box.material = "Ti6Al4V"
         BrassBox.material = "Brass"
-        WhiteMetalBox.material = "WhiteMetal"
+        SiCBox.material = "SiC"
         CarbonSteelBox.material = "CarbonSteel"
         aluminiumbox.material = "Aluminium"
     else:
         Ti90Al6V4Box.material = "Vacuum"
         BrassBox.material = "Vacuum"
-        WhiteMetalBox.material = "Vacuum"
+        SiCBox.material = "Vacuum"
         CarbonSteelBox.material = "Vacuum"
         aluminiumbox.material = "Vacuum"
 
@@ -235,6 +252,7 @@ if __name__ == "__main__":
     try:
         parser=argparse.ArgumentParser(description="Compare simulations performed with Gate and gVXR")
         parser.add_argument("--particles", type=int, default=5000000, help="Total number of particles")
+        parser.add_argument("--white-images", type=int, default=10, help="Number of white images for the flat field correction")
         parser.add_argument("--SOD", type=float, default=1000, help="source-object distance in mm")
         parser.add_argument("--SDD", type=float, default=1000+536, help="source-detector distance in mm")
 
@@ -255,8 +273,8 @@ if __name__ == "__main__":
         from pathlib import Path
         import multiprocessing
 
-        import SimpleITK as sitk
-        # from tifffile import imread, imwrite
+        # import SimpleITK as sitk
+        from tifffile import imwrite
         import xraylib as xrl
 
         import matplotlib
@@ -310,11 +328,11 @@ if __name__ == "__main__":
         Ti90Al6V4Box_size_in_cm = np.array([7.0, 7.0, 0.5])
         Ti90Al6V4Box_translation_in_cm = np.array([4.0, 4.0, 0.0])
 
-        BrassBox_size_in_cm = np.array([7.0, 7.0, 0.4])
+        BrassBox_size_in_cm = np.array([7.0, 7.0, 0.2])
         BrassBox_translation_in_cm = np.array([-4.0, 4.0, 0.0])
 
-        WhiteMetalBox_size_in_cm = np.array([7.0, 7.0, 0.3])
-        WhiteMetalBox_translation_in_cm = np.array([4.0, -4.0, 0.0])
+        SiCBox_size_in_cm = np.array([7.0, 7.0, 1.0])
+        SiCBox_translation_in_cm = np.array([4.0, -4.0, 0.0])
 
         CarbonSteelBox_size_in_cm = np.array([7.0, 7.0, 0.2])
         CarbonSteelBox_translation_in_cm = np.array([-4.0, -4.0, 0.0])
@@ -333,7 +351,8 @@ if __name__ == "__main__":
         ])
 
         pixel_size_in_mm = np.array([detector_size_in_mm[0] / detector_cols, detector_size_in_mm[1] / detector_rows, 10])
-
+        print(pixel_size_in_mm)
+        exit()
         use_scintillation = args.scintillation
 
         if use_scintillation:
@@ -345,6 +364,9 @@ if __name__ == "__main__":
         total_number_of_photons = args.particles
         number_of_photons_per_pixel = max(1,round(total_number_of_photons / (detector_cols * detector_rows)))
 
+
+        white_images = args.white_images
+
         if use_scintillation:
             output_dir = "./output_data/Gate_gVXR-comparison/with_scintillation"
         else:
@@ -353,10 +375,10 @@ if __name__ == "__main__":
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
 
-        gate_flat_image_fname = "gate_flat_image-" + str(total_number_of_photons) + "photons.mha"
-        gate_attenuation_image_fname = "gate_attenuation_image-" + str(total_number_of_photons) + "photons.mha"
-        gvxr_flat_image_fname = "gvxr_flat_image-" + str(total_number_of_photons) + "photons.mha"
-        gvxr_attenuation_image_fname = "gvxr_attenuation_image-" + str(total_number_of_photons) + "photons.mha"
+        gate_flat_image_fname = "gate_flat_image-" + str(total_number_of_photons) + "photons.tif"
+        gate_attenuation_image_fname = "gate_attenuation_image-" + str(total_number_of_photons) + "photons.tif"
+        gvxr_flat_image_fname = "gvxr_flat_image-" + str(total_number_of_photons) + "photons.tif"
+        gvxr_attenuation_image_fname = "gvxr_attenuation_image-" + str(total_number_of_photons) + "photons.tif"
 
 
 
@@ -367,30 +389,52 @@ if __name__ == "__main__":
         gvxr_start_time = time()
         gvxr_attenuation_image, gvxr_flat_image = runGVXR()
         gvxr_stop_time = time()
-        # gvxr.renderLoop()
-        # exit()
+        execution_time_gvxr = gvxr_stop_time - gvxr_start_time
+        gvxr.setMarkerLength(0.0, "mm")
+        gvxr.renderLoop()
+        exit()
         gvxr_flat_image[gvxr_flat_image<1e-6] = 1e-6
 
-        sitk_image = sitk.GetImageFromArray(gvxr_flat_image.astype(np.single))
-        sitk.WriteImage(sitk_image, os.path.join(output_dir, gvxr_flat_image_fname))
+        # sitk_image = sitk.GetImageFromArray(gvxr_flat_image.astype(np.single))
+        # sitk.WriteImage(sitk_image, os.path.join(output_dir, gvxr_flat_image_fname))
 
-        sitk_image = sitk.GetImageFromArray(gvxr_attenuation_image.astype(np.single))
-        sitk.WriteImage(sitk_image, os.path.join(output_dir, gvxr_attenuation_image_fname))
+        # sitk_image = sitk.GetImageFromArray(gvxr_attenuation_image.astype(np.single))
+        # sitk.WriteImage(sitk_image, os.path.join(output_dir, gvxr_attenuation_image_fname))
 
-        sim = initGate(spectrum, output_dir, gate_attenuation_image_fname)
+        imwrite(os.path.join(output_dir, gvxr_flat_image_fname), gvxr_flat_image.astype(np.single))
+        imwrite(os.path.join(output_dir, gvxr_attenuation_image_fname), gvxr_attenuation_image.astype(np.single))
+
+        sim, detector_actor = initGate(spectrum)
         addPhantom(sim, use_dummy=False)
-        gate_start_time1 = time()
+        gate_start_time = time()
         sim.run(True)
-        gate_stop_time1 = time()
+        gate_stop_time = time()
+        execution_time_gate = gate_stop_time - gate_start_time
 
-        sim = initGate(spectrum, output_dir, gate_flat_image_fname)
-        addPhantom(sim, use_dummy=True)
-        gate_start_time0 = time()
-        sim.run(True)
-        gate_stop_time0 = time()
+        if use_scintillation:
+            gate_attenuation_image = np.asarray(detector_actor.edep.image)[0]
+        else:
+            gate_attenuation_image = np.asarray(detector_actor.fluence.image)[0]
 
-        execution_time_gate = gate_stop_time0 - gate_start_time0 + gate_stop_time1 - gate_start_time1
-        execution_time_gvxr = gvxr_stop_time - gvxr_start_time
+        imwrite(os.path.join(output_dir, gate_attenuation_image_fname), gate_attenuation_image.astype(np.single))
+
+        gate_flat_image = np.zeros(gate_attenuation_image.shape, dtype=np.single)
+        for i in range(white_images):
+            sim, detector_actor = initGate(spectrum)
+            addPhantom(sim, use_dummy=True)
+            gate_start_time = time()
+            sim.run(True)
+            gate_stop_time = time()
+            execution_time_gate += gate_stop_time - gate_start_time
+
+            if use_scintillation:
+                gate_flat_image += np.asarray(detector_actor.edep.image)[0]
+            else:
+                gate_flat_image += np.asarray(detector_actor.fluence.image)[0]
+
+        gate_flat_image /= white_images
+        imwrite(os.path.join(output_dir, gate_flat_image_fname), gate_flat_image.astype(np.single))
+
 
         execution_time_fname = os.path.join(output_dir, "execution_time.dat")
         if os.path.exists(execution_time_fname):
@@ -478,17 +522,17 @@ if __name__ == "__main__":
         # sorted_actors = sorted(l, key=lambda d: d.priority)
         # print(f"Actors order: ", [[l.name, l.priority] for l in sorted_actors])
 
-        if use_scintillation:
-            gate_flat_image_fname = Path(gate_flat_image_fname).stem + "_edep.mha"
-            gate_attenuation_image_fname = Path(gate_attenuation_image_fname).stem + "_edep.mha"
+        # if use_scintillation:
+        #     gate_flat_image_fname = Path(gate_flat_image_fname).stem + "_edep.mha"
+        #     gate_attenuation_image_fname = Path(gate_attenuation_image_fname).stem + "_edep.mha"
 
         if os.path.exists(os.path.join(output_dir, gate_flat_image_fname)) and \
             os.path.exists(os.path.join(output_dir, gate_attenuation_image_fname)) and \
             os.path.exists(os.path.join(output_dir, gvxr_flat_image_fname)) and \
             os.path.exists(os.path.join(output_dir, gvxr_attenuation_image_fname)):
 
-            gate_flat_image = sitk.GetArrayFromImage(sitk.ReadImage(os.path.join(output_dir, gate_flat_image_fname)))[0]
-            gate_attenuation_image = sitk.GetArrayFromImage(sitk.ReadImage(os.path.join(output_dir, gate_attenuation_image_fname)))[0]
+            # gate_flat_image = sitk.GetArrayFromImage(sitk.ReadImage(os.path.join(output_dir, gate_flat_image_fname)))[0]
+            # gate_attenuation_image = sitk.GetArrayFromImage(sitk.ReadImage(os.path.join(output_dir, gate_attenuation_image_fname)))[0]
             
 
             # plt.figure()
