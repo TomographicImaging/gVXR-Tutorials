@@ -275,7 +275,7 @@ if __name__ == "__main__":
 
         # import SimpleITK as sitk
         from tifffile import imwrite
-        import xraylib as xrl
+        # import xraylib as xrl
 
         import matplotlib
         import matplotlib.pyplot as plt
@@ -352,7 +352,6 @@ if __name__ == "__main__":
 
         pixel_size_in_mm = np.array([detector_size_in_mm[0] / detector_cols, detector_size_in_mm[1] / detector_rows, 10])
         print(pixel_size_in_mm)
-        exit()
         use_scintillation = args.scintillation
 
         if use_scintillation:
@@ -392,7 +391,6 @@ if __name__ == "__main__":
         execution_time_gvxr = gvxr_stop_time - gvxr_start_time
         gvxr.setMarkerLength(0.0, "mm")
         gvxr.renderLoop()
-        exit()
         gvxr_flat_image[gvxr_flat_image<1e-6] = 1e-6
 
         # sitk_image = sitk.GetImageFromArray(gvxr_flat_image.astype(np.single))
@@ -608,32 +606,32 @@ if __name__ == "__main__":
 
             energy_response = np.array(gvxr.getEnergyResponse("keV"))
 
-            if energy_response.shape[0]:
-                plot_fname = os.path.join(output_dir, "energy-response-" + "{:.2f}".format(gvxr.getScintillatorThickness("um")) + "um-of-" + gvxr.getScintillatorMaterial())
-                # plt.title("Beam spectrum")
-                plt.figure(figsize= (15,10))
-                plt.scatter(energy_response[:,0], energy_response[:,1], label="gVXR", marker="x")
-                plt.xlabel('Incident energy in keV')
-                plt.ylabel('Relative detector energy response')
+            # if energy_response.shape[0]:
+            #     plot_fname = os.path.join(output_dir, "energy-response-" + "{:.2f}".format(gvxr.getScintillatorThickness("um")) + "um-of-" + gvxr.getScintillatorMaterial())
+            #     # plt.title("Beam spectrum")
+            #     plt.figure(figsize= (15,10))
+            #     plt.scatter(energy_response[:,0], energy_response[:,1], label="gVXR", marker="x")
+            #     plt.xlabel('Incident energy in keV')
+            #     plt.ylabel('Relative detector energy response')
 
-                mat = "Gd2O2S"
-                rho = 4.76
-                thickness = scintillator_thickness_in_mm / 10.0 #cm
+            #     mat = "Gd2O2S"
+            #     rho = 4.76
+            #     thickness = scintillator_thickness_in_mm / 10.0 #cm
 
-                energy_range = np.logspace(0., 2.48, num=1000)
-                response = [E*(xrl.CS_Energy_CP(mat, E)/xrl.CS_Total_CP(mat, E))*(1.-np.exp(-xrl.CS_Total_CP(mat, E) * float(rho) * thickness)) for E in energy_range]
-                plt.plot(energy_range, energy_range,color="red",linewidth=1.,linestyle="--")
-                plt.plot(energy_range, response,color="blue",linewidth=2.,linestyle="-", label="JML's code")
-                plt.xlim(0.,300.)
-                plt.ylim(0.,40.)
+            #     energy_range = np.logspace(0., 2.48, num=1000)
+            #     response = [E*(xrl.CS_Energy_CP(mat, E)/xrl.CS_Total_CP(mat, E))*(1.-np.exp(-xrl.CS_Total_CP(mat, E) * float(rho) * thickness)) for E in energy_range]
+            #     plt.plot(energy_range, energy_range,color="red",linewidth=1.,linestyle="--")
+            #     plt.plot(energy_range, response,color="blue",linewidth=2.,linestyle="-", label="JML's code")
+            #     plt.xlim(0.,300.)
+            #     plt.ylim(0.,40.)
 
-                plt.legend()
-                plt.tight_layout()
-                plt.savefig(plot_fname + ".pdf")
-                plt.savefig(plot_fname + ".png")
-                plt.close()
-                # plt.show()
-                # exit()
+            #     plt.legend()
+            #     plt.tight_layout()
+            #     plt.savefig(plot_fname + ".pdf")
+            #     plt.savefig(plot_fname + ".png")
+            #     plt.close()
+            #     # plt.show()
+            #     # exit()
 
 
 
