@@ -152,15 +152,18 @@ def initGate(spectrum):
 
     # CBCT gantry source
     gantry = sim.add_volume("Box", "CBCT_gantry")
-    gantry.size = [0.2 * m, 0.2 * m, 0.2 * m]
+    gantry.size = np.array([0.2 * m, 0.2 * m, 0.2 * m])
     # gantry.material = "G4_AIR"
     gantry.material = "Vacuum"
     gantry.color = [0, 1, 1, 1]
     gantry.translation = gantry_position_in_mm * mm
 
+    print("gantry.size [in m]:", gantry.size / m)
+    print("gantry.translation [in mm]:", gantry.translation / mm)
+
     # CBCT detector plane
     detector_plane = sim.add_volume("Box", "CBCT_detector_plane")
-    detector_plane.size = [409.6 * mm, 409.6 * mm, scintillator_thickness_in_mm * mm]
+    detector_plane.size = np.array([*detector_size_in_mm, scintillator_thickness_in_mm]) * mm
 
     # detector_plane.size = [409.6 * mm, 409.6 * mm, 0.6 * mm]
     if use_scintillation:
@@ -170,6 +173,9 @@ def initGate(spectrum):
     # detector_plane.material = "CsI"
     detector_plane.color = [1, 0, 0, 1]
     detector_plane.translation = detector_position_in_mm * mm
+
+    print("detector_plane.size [in mm]:", detector_plane.size / mm)
+    print("detector_plane.translation [in mm]:", detector_plane.translation / mm)
 
     # actor
     if use_scintillation:
@@ -182,9 +188,12 @@ def initGate(spectrum):
     detector_actor.size = [detector_cols, detector_rows, 1]
     detector_actor.write_to_disk = False
 
+    print("detector_actor.spacing:", detector_actor.spacing)
+    print("detector_actor.size:", detector_actor.size)
+
     # physics
     sim.physics_manager.physics_list_name = "G4EmStandardPhysics_option1"
-    sim.physics_manager.set_production_cut("world", "all", 10 * mm)
+    sim.physics_manager.set_production_cut("world", "all", 0.1 * um)
 
     # source
     source = sim.add_source("GenericSource", "mysource")
@@ -199,9 +208,15 @@ def initGate(spectrum):
 
     source.position.type = "box"
     source.position.size = source_size_in_mm * mm
+    print("source.position.size [in mm]:", source.position.size / mm)
     source.direction.type = "focused"
     source.direction.focus_point = source_focus_point_position_in_mm * mm
     source.n = total_number_of_photons / sim.number_of_threads
+    print("source.energy.type:", source.energy.type)
+    print("source.position.type:", source.position.type)
+    print("source.direction.type:", source.direction.type)
+    print("source.direction.focus_point [in mm]:", source.direction.focus_point / mm)
+    print("source.n:", source.n)
 
     return sim, detector_actor
 
@@ -307,6 +322,7 @@ if __name__ == "__main__":
         m = gate.g4_units.m
         cm = gate.g4_units.cm
         nm = gate.g4_units.nm
+        um = gate.g4_units.um
         cm3 = gate.g4_units.cm3
         keV = gate.g4_units.keV
         MeV = gate.g4_units.MeV
@@ -350,14 +366,15 @@ if __name__ == "__main__":
             (abs(detector_position_in_mm[2]) + abs(source_focus_point_position_in_mm[2])) * source_size_in_mm[1] / abs(gantry_position_in_mm[2] - source_focus_point_position_in_mm[2])
         ])
 
-        pixel_size_in_mm = np.array([detector_size_in_mm[0] / detector_cols, detector_size_in_mm[1] / detector_rows, 10])
-        print(pixel_size_in_mm)
         use_scintillation = args.scintillation
 
         if use_scintillation:
             scintillator_thickness_in_mm = 0.21
         else:
             scintillator_thickness_in_mm = 1e-6
+
+        pixel_size_in_mm = np.array([detector_size_in_mm[0] / detector_cols, detector_size_in_mm[1] / detector_rows, scintillator_thickness_in_mm])
+        print(pixel_size_in_mm)
 
         # energy_in_keV = 60
         total_number_of_photons = args.particles
