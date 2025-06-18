@@ -65,7 +65,10 @@ def initGVXR():
     gvxr.setDetectorPixelSize(pixel_size_in_mm[0], pixel_size_in_mm[1], "mm");
 
     if use_scintillation:
-        gvxr.setScintillator("Gd2O2S DRZ-Plus", scintillator_thickness_in_mm, "mm")
+        # gvxr.setScintillator("Gd2O2S DRZ-Plus", scintillator_thickness_in_mm, "mm")
+        # gvxr.loadDetectorEnergyResponse("./data/responseDetector_nomuen.txt", "keV")
+        # gvxr.loadDetectorEnergyResponse("./data/energy_response_opt1.dat", "keV")
+        gvxr.loadDetectorEnergyResponse("./data/energy_response_opt4.dat", "keV")
 
     gvxr.makeCuboid("Ti90Al6V4Box", *Ti90Al6V4Box_size_in_cm, "cm")
     gvxr.translateNode("Ti90Al6V4Box", *Ti90Al6V4Box_translation_in_cm, "cm")
@@ -407,7 +410,7 @@ if __name__ == "__main__":
         gvxr_stop_time = time()
         execution_time_gvxr = gvxr_stop_time - gvxr_start_time
         gvxr.setMarkerLength(0.0, "mm")
-        gvxr.renderLoop()
+        # gvxr.renderLoop()
         gvxr_flat_image[gvxr_flat_image<1e-6] = 1e-6
 
         # sitk_image = sitk.GetImageFromArray(gvxr_flat_image.astype(np.single))
