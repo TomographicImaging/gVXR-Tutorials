@@ -25,4 +25,4 @@ dependencies:
     - pip:
         - opengate
         - viewscad
-        - gvxr>=2.0.10
+        - gvxr>=2.0.11
