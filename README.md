@@ -29,6 +29,7 @@
     - Detector paramaters
     - Realistic CT scans
     - Artefacts in CT images
+    - [Spectral radiography](notebooks/spectral-imaging.ipynb)
     - Spectral CT imaging
     - 2D-3D registration of a clinical digital radiograph
 - How to find help
@@ -84,6 +85,7 @@ We also shows how to plot the corresponding energy response. <a href="https://co
 - Artefacts in CT images: Explore the common source of artefact in CT images:
     - For **aliasing artefacts**, you may look at [Ideal CT scan](notebooks/multi_material-CT_scan.ipynb) where the number of projections was far too low.
     - For **low dose** CT scans, you may look at [Low dose CT scan](notebooks/multi_material-CT_scan-low_dose.ipynb) where you can control the noise level and the number of projections.
+- [Spectral radiography](notebooks/spectral-imaging.ipynb): Make use of an energy-resolved detector.
 - Spectral CT imaging:
 - 2D-3D registration of a clinical digital radiograph:
 - Laminography:
