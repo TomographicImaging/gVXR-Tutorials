@@ -463,9 +463,9 @@ if __name__ == "__main__":
         speedup = execution_time_gate / execution_time_gvxr
         with open(execution_time_fname, "a") as myfile:
             if not file_exists:
-                myfile.write("total_number_of_photons,execution time Gate in sec,execution time gVXR in sec,speedup\n")
+                myfile.write("total_number_of_photons,execution time Gate in sec,execution time gVXR in sec,speedup,number of cores\n")
 
-            myfile.write("%i    &    %f    &    %f    &    %i\\\\\n" % (total_number_of_photons,execution_time_gate, execution_time_gvxr,speedup))
+            myfile.write("%i    &    %f    &    %f    &    %i    &    %i\\\\\n" % (total_number_of_photons,execution_time_gate, execution_time_gvxr,speedup,multiprocessing.cpu_count()))
 
 
         print("********************************************************************************")
