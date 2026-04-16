@@ -11,11 +11,11 @@
     - Using pip
 - Content of this repository
     - [Cheat sheet](CHEAT_SHEET.md)
-    - [Test installation](notebooks/test_installation.ipynb) 
-    - [First X-ray simulation](notebooks/first_xray_simulation.ipynb)
-    - [Numpy integration](notebooks/numpy_integration.ipynb)
-    - [3D visualisation](notebooks/visualisation.ipynb)
-    - [Multi-material anatomical example](notebooks/multi_material-lungman_phantom.ipynb)
+    - [Test installation](notebooks/test_installation.ipynb) (now compatible with gVXR 2.1.0)
+    - [First X-ray simulation](notebooks/first_xray_simulation.ipynb) (now compatible with gVXR 2.1.0)
+    - [Numpy integration](notebooks/numpy_integration.ipynb) (now compatible with gVXR 2.1.0)
+    - [3D visualisation](notebooks/visualisation.ipynb) (now compatible with gVXR 2.1.0)
+    - [Multi-material anatomical example](notebooks/multi_material-lungman_phantom.ipynb) (now compatible with gVXR 2.1.0)
     <!-- - [Magnification](notebooks/magnification.ipynb) -->
     - [Polychromtic X-ray tube spectra](notebooks/polychromatism.ipynb)
     - [Scintillation](notebooks/scintillation.ipynb)
