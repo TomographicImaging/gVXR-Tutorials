@@ -17,7 +17,7 @@
     - [3D visualisation](notebooks/visualisation.ipynb) (now compatible with gVXR 2.1.0)
     - [Multi-material anatomical example](notebooks/multi_material-lungman_phantom.ipynb) (now compatible with gVXR 2.1.0)
     <!-- - [Magnification](notebooks/magnification.ipynb) -->
-    - [Polychromtic X-ray tube spectra](notebooks/polychromatism.ipynb)
+    - [Polychromtic X-ray tube spectra](notebooks/polychromatism.ipynb) (now compatible with gVXR 2.1.0)
     - [Scintillation](notebooks/scintillation.ipynb)
     - [Monte Carlo vs. determinist](notebooks/Gate_gVXR-comparison.ipynb)
     - [Ideal CT scan](notebooks/multi_material-CT_scan.ipynb)
