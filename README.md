@@ -29,7 +29,7 @@
     - Detector paramaters
     - Realistic CT scans
     - Artefacts in CT images
-    - [Spectral radiography](notebooks/spectral-imaging.ipynb)
+    - [Spectral radiography](notebooks/spectral-imaging.ipynb) (now compatible with gVXR 2.1.0)
     - Spectral CT imaging
     - 2D-3D registration of a clinical digital radiograph
 - How to find help
