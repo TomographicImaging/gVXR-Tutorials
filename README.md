@@ -21,7 +21,7 @@
     - [Scintillation](notebooks/scintillation.ipynb) (now compatible with gVXR 2.1.0)
     - [Monte Carlo vs. determinist](notebooks/Gate_gVXR-comparison.ipynb) (now compatible with gVXR 2.1.0)
     - [Ideal CT scan](notebooks/multi_material-CT_scan-disk.ipynb) (now compatible with gVXR 2.1.0)
-    - [Low dose CT scan](notebooks/multi_material-CT_scan-low_dose.ipynb)
+    - [Low dose CT scan](notebooks/multi_material-CT_scan-low_dose.ipynb) (now compatible with gVXR 2.1.0)
     - Creating, combining and moving 3D objects
     - Built-in phantoms
     - Multi-material samples using chemical elements, mixtures and compounds
