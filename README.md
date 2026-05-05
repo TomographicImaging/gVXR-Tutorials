@@ -117,10 +117,28 @@ See [Q&A](QnA.md).
 
 If you use gVXR in your own applications, particularly for research & development, I will be grateful if you could cite the articles as follows:
 
-- **Seminal paper**: Vidal, F. P., Garnier, M., Freud, N., Létang, J. M., and John, N. W., “Simulation of x-ray attenuation on the GPU,” in [Proceedings of Theory and Practice of Computer Graphics 2009](https://diglib.eg.org/collections/916dfc7f-8278-428f-9ae3-c85aeff29595), 25–32, [Eurographics Association](https://www.eg.org/), Cardiff, UK (June 2009). DOI: [10.2312/LocalChapterEvents/TPCG/TPCG09/025-032](https://doi.org/10.2312/LocalChapterEvents/TPCG/TPCG09/025-032)
-- **First reference to gVXR as an opensource software**: Vidal, F. P. and Villard, P.-F., “Development and validation of real-time simulation of x-ray imaging with respiratory motion,” Computerized Medical Imaging and Graphics 49, 1–15 (2016). DOI: [10.1016/j.compmedimag.2015.12.002](https://doi.org/10.1016/j.compmedimag.2015.12.002)
-- **Clinical validation study**: Pointon, J. L., Wen, T., Tugwell-Allsup, J., Sújar, A., Létang, J. M., and Vidal, F. P., “Simulation of x-ray projections on gpu: Benchmarking gvirtualxray with clinically realistic phantoms,” Computer Methods and Programs in Biomedicine 234, 107500 (2023). DOI: [10.1016/j.cmpb.2023.107500](https://doi.org/10.1016/j.cmpb.2023.107500)
-- **Review paper on CT applications**: Vidal, F. P., Afshari, S., Ahmed, S., Atkins, C. Béchet, E., Bellot, A., Bosse, S., Chahid, Y., Chou, C.-Y., Culver, R., Dixon, L., Friemann, J., Garbout, A., Hatton, C., Henry, A., Leblanc, C., Leonardi, A., Létang, J. M., Lipscomb, H., Manchester, T., Meere, B., Middleburgh, S., Mitchell, I., Perera, L., Puig, M., and Tugwell-Allsup, J., “X-ray simulations with gVXR as a useful tool for education, data analysis, set-up of CT scans, and scanner development,” in [Developments in X-Ray Tomography XV, SPIE Optics & Photonics](https://doi.org/10.1117/12.3025315), Volume 13152, [SPIE](https://spie.org/), San Diego, California, United States (Aug 2024). DOI: [10.1117/12.3025315](https://doi.org/10.1117/12.3025315)
+**Community review paper:** F.P. Vidal, S. Afshari, S. Ahmed, A. Albiol, F. Albiol, É. Béchet, A. Corbí Bellot, S. Bosse, 
+S. Burkhard, Y. Chahid, C.-Y. Chou, R. Culver, P. Desbarats, L. Dixon, J. Friemann, A. Garbout, M. García-Lorenzo,
+J.-F. Giovannelli, R. Hanna, C. Hatton, A. Henry, G. Kelly, C. Leblanc, A. Leonardi, J. M. Létang, H. Lipscomb,
+T. Manchester, B. Meere, C. Michelet, S. Middleburgh, R.P. Mihail, I.T. Mitchell, L. Perera, M. Puig, M. Racy,
+A. Rouwane, H. Seznec, A. Sújar, J. Tugwell-Allsup, and P.-F. Villard: 
+X-ray simulations with gVXR in education, digital twining, experiment planning, and data analysis
+*Nuclear Instruments and Methods in Physics Research Section B: Beam Interactions with Materials and Atoms*, 568 (2025), pp. 165804,
+[doi: 10.1016/j.nimb.2025.165804](https://doi.org/10.1016/j.nimb.2025.165804)
+
+**Clinical validation study:** J.L. Pointon, T. Wen, J. Tugwell-Allsup, A. Sújar, J.M. Létang, and F.P. Vidal: 
+Simulation of X-ray projections on GPU: Benchmarking gVirtualXray with clinically realistic phantoms. 
+*Computer Methods and Programs in Biomedicine*, 234 (2023), pp. 107500, 
+[doi: 10.1016/j.cmpb.2023.107500](https://doi.org/10.1016/j.cmpb.2023.107500)
+
+**First reference to gVXR as an opensource software:** F.P. Vidal and P.-F. Villard: 
+Development and validation of real-time simulation of X-ray imaging with respiratory motion. 
+*Computerized Medical Imaging Graphics*, 49 (2016), pp. 1-15, 
+[doi: 10.1016/j.compmedimag.2015.12.002](https://doi.org/10.1016/j.compmedimag.2015.12.002)
+
+**Seminal paper:** F.P. Vidal, M. Garnier, N. Freud, J.M. Létang, and N.W. John: Simulation of X-ray attenuation on the GPU. 
+*Proceedings of Theory and Practice of Computer Graphics 2009*, Eurographics Association, Cardiff, UK (2009), pp. 25-32, 
+[doi: 10.2312/LocalChapterEvents/TPCG/TPCG09/025-032](https://doi.org/10.2312/LocalChapterEvents/TPCG/TPCG09/025-032)
 
 ## User contributions on our website
 
