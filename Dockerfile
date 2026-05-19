@@ -1,23 +1,26 @@
 # set base image (host OS)
 FROM ghcr.io/tomographicimaging/cil:25.0.0
 
-# EGL
-RUN sudo apt-get update && apt-get install -y \
+USER root
+
+RUN apt-get update && apt-get install -y \
     libegl1-mesa \
-    libnvidia-gl-550-server \
-    openscad \
+    libnvidia-gl-550 \
     mesa-utils \
     mesa-utils-extra \
-    xterm
+    vulkan-tools \
+    && rm -rf /var/lib/apt/lists/*
 
-RUN sudo apt-get clean
+RUN apt-get clean
+
+USER "${NB_UID}"
 
 # Change the workdir
 WORKDIR /gvxr
 
-# Install Python packages
-RUN python3 -m pip install --user backports.tarfile
-RUN python3 -m pip install --user gVXR viewscad SimpleITK progressbar k3d
+COPY --chown=${NB_UID}:${NB_GID} environment.yml /tmp/
+COPY --chown=${NB_UID}:${NB_GID} python/wheels/gvxr-2.1.0-cp311-cp311-manylinux_2_34_x86_64.whl /tmp/
 
-# For debugging
-# CMD xterm
+RUN mamba create -f /tmp/environment.yml \
+    && mamba clean --all -f -y \
+    && fix-permissions "${CONDA_DIR}" && "/home/${NB_USER}"

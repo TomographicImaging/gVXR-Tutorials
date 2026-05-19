@@ -1,39 +1,23 @@
-name: gvxr-tutorials
+name: gvxr-dXCT2026
 channels:
     - conda-forge
     - https://software.repos.intel.com/python/conda
     - ccpi
-    - pytorch
     - nvidia
 dependencies:
-    - ipyevents
-    - ipympl
-    - ipywidgets
-    - jupyterlab
-    - matplotlib
-    - mpl-interactions
-    - numpy
-    - pandas
     - python=3.11
-    - SimpleITK
+    - matplotlib>=3.7
+    - numpy>=1.26,<2.0
+    - scipy>=1.10
+    - pandas>=1.5
+    - tqdm>=4.66
+    - tensorflow==2.17.*
     - cil
-    - ccpi-regulariser
-    - astra-toolbox=*=cuda*
-    - tigre
+    - "astra-toolbox=*=cuda*"
     - progressbar
     - k3d
-#    - python-dotenv
-#    - pytorch-cuda
-#    - torchvision
-    - keras
-    - protobuf
-    - tensorflow-gpu
-    - fsspec
-#    - opencv
     - pip
     - pip:
-        - opengate
-        - viewscad
-#        - gvxr>=2.0.11
-        - git+git://git.code.sf.net/p/gvirtualxray/gitroot
-        - segmentation-models
+        # Install gVXR via wheel because of version incompatibility
+        - /tmp/gvxr-2.1.0-cp311-cp311-manylinux_2_34_x86_64.whl
+        - segmentation-models==1.0.1
