@@ -6,15 +6,15 @@ channels:
     - pytorch
     - nvidia
 dependencies:
+    - python=3.11
+    - numpy
+    - pandas
+    - matplotlib
     - ipyevents
     - ipympl
     - ipywidgets
     - jupyterlab
-    - matplotlib
     - mpl-interactions
-    - numpy
-    - pandas
-    - python=3.11
     - SimpleITK
     - cil
     - ccpi-regulariser
@@ -32,8 +32,7 @@ dependencies:
 #    - opencv
     - pip
     - pip:
+        - "gvxr==2.1.0"
         - opengate
         - viewscad
-#        - gvxr>=2.0.11
-        - git+git://git.code.sf.net/p/gvirtualxray/gitroot
         - segmentation-models
