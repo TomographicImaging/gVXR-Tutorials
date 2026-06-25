@@ -18,6 +18,7 @@
 
 
 import os
+import numpy as np
 
 import urllib.request
 import progressbar
@@ -143,3 +144,84 @@ def loadLungmanMeshes(mesh_path):
                 geometry_set[label]["Colour"][1] / 255.0,
                 geometry_set[label]["Colour"][2] / 255.0,
                 geometry_set[label]["Colour"][3]);
+
+
+def crop_image(img):
+    """
+    Crop an image to remove the possible empty border around the data
+    :param img: the input image
+    :return: the image after border removal
+    """
+    if np.max(img) != np.min(img):
+
+        # Crop on the left if needed
+        min_i = 0
+        stop = False
+        while not stop:
+
+            if img[:, min_i].sum() == 0:
+                min_i += 1
+            else:
+                stop = True
+
+        # Crop on the right if needed
+        max_i = img.shape[1] - 1
+        stop = False
+        while not stop:
+
+            if img[:, max_i].sum() == 0:
+                max_i -= 1
+            else:
+                stop = True
+
+        # Crop on the top if needed
+        min_j = 0
+        stop = False
+        while not stop:
+
+            if img[min_j, :].sum() == 0:
+                min_j += 1
+            else:
+                stop = True
+
+        # Crop on the bottom if needed
+        max_j = img.shape[0] - 1
+        stop = False
+        while not stop:
+
+            if img[max_j, :].sum() == 0:
+                max_j -= 1
+            else:
+                stop = True
+
+        cropped = img[max(0, min_j - 1):max_j + 2, max(0, min_i - 1):max_i + 2]
+    else:
+        cropped = np.copy(img)
+
+    return cropped
+
+
+def pad_image(img, target_image_shape):
+    """
+    Zero padding of an image
+    :param img: the image to be padded
+    :param target_image: the target image size
+    :return: the padded image
+    """
+    extra_x_high = (target_image_shape[1] - img.shape[1]) // 2
+    extra_y_high = (target_image_shape[0] - img.shape[0]) // 2
+
+    if not (target_image_shape[1] - img.shape[1]) % 2:
+        extra_x_low = extra_x_high
+    else:
+        extra_x_low = extra_x_high + 1
+
+    if not (target_image_shape[0] - img.shape[0]) % 2:
+        extra_y_low = extra_y_high
+    else:
+        extra_y_low = extra_y_high + 1
+
+    return np.pad(img,
+                  ((extra_y_low, extra_y_high), (extra_x_low, extra_x_high)),
+                  mode='constant',
+                  constant_values=0)
