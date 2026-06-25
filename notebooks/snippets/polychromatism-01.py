@@ -1,3 +1,1 @@
-# Material property: Brass
-gvxr.setMixture("Dragon", ["Cu", "Zn"], [0.66, 0.44])
-gvxr.setDensity("Dragon", 8.73, "g.cm-3")
+log_norm_min_val = 1e-6
