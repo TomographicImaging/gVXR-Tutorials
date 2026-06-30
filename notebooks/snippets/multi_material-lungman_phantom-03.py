@@ -1,1 +1,1 @@
-gvxr.setMonoChromatic(90, "keV", 16000);
+gvxr.setMonoChromaticPerPixelAtSDD(90, "keV", 16000)
