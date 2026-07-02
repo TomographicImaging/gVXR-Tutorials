@@ -6,8 +6,8 @@
         "Position": [0.0, 457.474, 0.0, "mm"],
         "UpVector": [0.0, 0.0, -1.0],
         "RightVector": [-1.0, 0.0, 0.0],
-        "NumberOfPixels": [718, 718],
-        "Spacing": [600.0, 600.0, "um"],
+        "NumberOfPixels": [1972, 1972],
+        "Spacing": [150.0, 150.0, "um"],
         "Scintillator": {
             "Material": "Gd2O2S DRZ-Plus",
             "Thickness": 210,
