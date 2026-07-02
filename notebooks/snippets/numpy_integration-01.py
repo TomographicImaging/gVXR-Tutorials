@@ -1,0 +1,2 @@
+speedup_without_numpy_integration = duration_without_numpy_integration1 / duration_without_numpy_integration2
+speedup_with_numpy_integration = duration_without_numpy_integration1 / duration_with_numpy_integration

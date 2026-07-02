@@ -16,7 +16,9 @@
     - [Numpy integration](notebooks/numpy_integration.ipynb) (now compatible with gVXR 2.1.0)
     - [3D visualisation](notebooks/visualisation.ipynb) (now compatible with gVXR 2.1.0)
     - [Multi-material anatomical example](notebooks/multi_material-lungman_phantom.ipynb) (now compatible with gVXR 2.1.0)
-    <!-- - [Magnification](notebooks/magnification.ipynb) -->
+    - [Magnification, inverse square law, noise and artefacts in CT](notebooks/magnification-simulation.ipynb) (now compatible with gVXR 2.1.0)
+      - [Accompanying notebook to perform the CT reconstructions](notebooks/magnification-reconstruction.ipynb) (now 
+        compatible with gVXR 2.1.0)
     - [Polychromtic X-ray tube spectra](notebooks/polychromatism.ipynb) (now compatible with gVXR 2.1.0)
     - [Scintillation](notebooks/scintillation.ipynb) (now compatible with gVXR 2.1.0)
     - [Monte Carlo vs. determinist](notebooks/Gate_gVXR-comparison.ipynb) (now compatible with gVXR 2.1.0)
@@ -63,7 +65,19 @@ pip install matplotlib viewscad xpecgen spekpy SimpleITK k3d
 - [Numpy integration](notebooks/numpy_integration.ipynb): Experiment with the Numpy integration to speed up the simulation. <a href="https://colab.research.google.com/github/TomographicImaging/gVXR-Tutorials/blob/main/notebooks/numpy_integration.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
 - [3D visualisation](notebooks/visualisation.ipynb): Get familiar with the three different 3D visualisation method provided with gVXR, i) K3D to interactively visualise the 3D scene in a Jupyter widget, ii) a customisable static 3D visualisation, and iii) an interactive 3D visualisation window. <a href="https://colab.research.google.com/github/TomographicImaging/gVXR-Tutorials/blob/main/notebooks/visualisation.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
 - [Multi-material anatomical example](notebooks/multi_material-lungman_phantom.ipynb): Using the knowledge learnt in [First X-ray simulation](notebooks/first_xray_simulation.ipynb), initialise your own simulation to create a radiograph of the Lungman phantom. <a href="https://colab.research.google.com/github/TomographicImaging/gVXR-Tutorials/blob/main/notebooks/multi_material-lungman_phantom.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
-<!-- - [Magnification](notebooks/magnification.ipynb): ADD TEXT HERE<a href="https://colab.research.google.com/github/TomographicImaging/gVXR-Tutorials/blob/main/notebooks/magnification.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a> -->
+- [Magnification, inverse square law, noise and artefacts in CT](notebooks/magnification-simulation.ipynb): We 
+  explore i) how to exploit the magnification to compute the pixel size in the object plane rather than flat panel 
+  plane, ii) how the source-to-detector distance affects the image quality in terms of noise, and 
+  iii) the impact of sample material, noise and polychromatism on CT reconstructions. 
+  <a href="https://colab.research.google.com/github/TomographicImaging/gVXR-Tutorials/blob/main/notebooks/magnification-simulation.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
+  - [Accompanying notebook to perform the CT reconstructions](notebooks/magnification-reconstruction.ipynb): We will 
+    exploit the simulation data generated using 
+    [`notebooks/magnification-simulation.ipynb`](./notebooks/magnification-simulation.ipynb) 
+    to i) reconstruct the CT slices using the [core imaging library (CIL)](https://www.ccpi.ac.uk/cil/), 
+    ii)  use the zero-mean, unit-variance normalisation to rescale pixel values, 
+    iii) identify imaging artefacts by comparing pairs of images, and 
+    iv) extract intensity profiles to assess noise and cupping artefacts. 
+    <a href="https://colab.research.google.com/github/TomographicImaging/gVXR-Tutorials/blob/main/notebooks/magnification-reconstruction.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
 - [Polychromtic X-ray tube spectra](notebooks/polychromatism.ipynb): In this notebook we explore how to specify polychromtic X-ray tube spectra, without and with filtration. We also shows how to plot the spectrum. <a href="https://colab.research.google.com/github/TomographicImaging/gVXR-Tutorials/blob/main/notebooks/polychromatism.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
 - [Scintillation](notebooks/scintillation.ipynb): In this notebook we explore how to create a detector with a scintillator.
 We also shows how to plot the corresponding energy response. <a href="https://colab.research.google.com/github/TomographicImaging/gVXR-Tutorials/blob/main/notebooks/scintillation.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
@@ -82,7 +96,7 @@ We also shows how to plot the corresponding energy response. <a href="https://co
 - Source types and paramaters: Differentiate between source types (parallel beam, e.g. synchrotron, and cone-beam, e.g. X-ray tube). For X-ray tube add extra levels of realism with the focal spot and polychromatic spectrum. Introduce the notion of magnification to compute the pixel size in radiography.
 - Detector paramaters: Revisit the notion of pixel size and add extra levels of realism with the point spread function and scintillator material.
 - Realistic CT scans: Using some of the knowledge learnt in the notebooks above, create realistic CT scan acquisitions for both synchrotron and labCT.
-- Artefacts in CT images: Explore the common source of artefact in CT images:
+- Artefacts in CT images: Explore the common source of artefacts in CT images:
     - For **aliasing artefacts**, you may look at [Ideal CT scan](notebooks/multi_material-CT_scan.ipynb) where the number of projections was far too low.
     - For **low dose** CT scans, you may look at [Low dose CT scan](notebooks/multi_material-CT_scan-low_dose.ipynb) where you can control the noise level and the number of projections.
 - [Spectral radiography](notebooks/spectral-imaging.ipynb): Make use of an energy-resolved detector.
