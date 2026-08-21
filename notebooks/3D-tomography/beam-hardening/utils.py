@@ -71,3 +71,37 @@ def setPolySpectrum(
     photon_count /= (photon_count * energy_bins).sum()
 
     return loadSpectrum(energy_bins, photon_count, unit, False)
+
+
+def makeHollowCylinder(
+    label,
+    number_of_sectors,
+    height,
+    outer_radius,
+    inner_radius,
+    unit_of_length,
+    *,
+    parent="root",
+):
+    # Outer cylinder
+    gvxr.makeCylinder(
+        label,
+        number_of_sectors,
+        height,
+        outer_radius,
+        unit_of_length,
+        parent,
+    )
+
+    # Inner cylinder
+    height_with_buffer = height + 0.01 * height
+    gvxr.makeCylinder(
+        "inner-cylinder",
+        number_of_sectors,
+        height_with_buffer,
+        inner_radius,
+        unit_of_length,
+        parent,
+    )
+
+    gvxr.subtractMesh(label, "inner-cylinder")
