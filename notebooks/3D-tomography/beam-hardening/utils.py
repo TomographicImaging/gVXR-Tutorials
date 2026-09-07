@@ -105,3 +105,55 @@ def makeHollowCylinder(
     )
 
     gvxr.subtractMesh(label, "inner-cylinder")
+
+
+def transmission_to_absorption(data, tol=1e-9):
+    data[data < tol] = tol
+    return -np.log(data)
+
+
+def find_optimal_stepwedge_size(
+    data: np.ndarray, material: str, tolerance: float, max_iterations: int = 50
+):
+    """Binary search to find the optimal stepwedge height.
+
+    Parameters
+    ----------
+    data: ndarray
+        The data of the sinorgam corresponding to the reconstruction.
+    """
+    detector_length, detector_width = gvxr.getDetectorSize("mm")
+
+    lower_bound = 0
+    upper_bound = gvxr.getSourceDetectorDistance("mm")
+
+    target = data.max()
+
+    for _ in range(max_iterations):
+        gvxr.removePolygonMeshesFromSceneGraph()
+        mid_value = (upper_bound + lower_bound) * 0.5
+
+        gvxr.makeCuboid("bin_search_couboid", mid_value, detector_length, detector_width, "mm")
+        gvxr.addPolygonMeshAsOuterSurface("bin_search_couboid")
+        gvxr.setElement("bin_search_couboid", material)
+
+        projection = (
+            np.array(gvxr.computeXRayImage(), dtype=np.single)
+            / gvxr.getTotalEnergyWithDetectorResponse()
+        )
+
+        neg_log_projection = transmission_to_absorption(projection)
+        max_projection = (
+            neg_log_projection.max()
+        )  # Should always be equal to 1 (unless the sample is larger)
+
+        if abs(max_projection - target) <= tolerance:
+            return mid_value
+
+        if max_projection < target - tolerance:
+            lower_bound = mid_value
+
+        else:
+            upper_bound = mid_value
+
+    return -1
