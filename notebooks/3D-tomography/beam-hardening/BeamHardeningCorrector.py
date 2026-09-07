@@ -37,7 +37,6 @@ class BeamHardeningCorrector(DataProcessor):
         self,
         polynomial_coefficients: np.ndarray,
         linear_attenuation_coefficient: float,
-        monochromatic_energy: float,
         max_path_length: float,
         precision: float,
         *,
@@ -47,7 +46,6 @@ class BeamHardeningCorrector(DataProcessor):
         kwargs = {
             "polynomial_coefficients": polynomial_coefficients,
             "linear_attenuation_coefficient": linear_attenuation_coefficient,
-            "monochromatic_energy": monochromatic_energy,
             "max_path_length": max_path_length,
             "precision": precision,
             "constant_bias": constant_bias,
@@ -77,7 +75,10 @@ class BeamHardeningCorrector(DataProcessor):
 
         # true_x_value = np.interp(data, poly_y_values, poly_x_values)
         true_x_value = np.interp(arr, poly_y_values, poly_x_values)
-        np.multiply(self.linear_attenuation_coefficient, true_x_value, out=arr)
+
+        # TODO add constant_bias() here
+        arr = self.linear_attenuation_coefficient * true_x_value + self.constant_bias
+        # np.multiply(self.linear_attenuation_coefficient, true_x_value, out=arr)
 
         out.fill(arr)
 
