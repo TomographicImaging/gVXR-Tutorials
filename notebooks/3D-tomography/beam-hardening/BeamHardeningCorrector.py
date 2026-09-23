@@ -1,7 +1,7 @@
 import logging
 
 import numpy as np
-from cil.framework import DataProcessor
+from cil.framework import AcquisitionData, DataProcessor
 
 log = logging.getLogger(__name__)
 
@@ -17,14 +17,11 @@ class BeamHardeningCorrector(DataProcessor):
 
     linear_attenuation_coefficient: float
 
-    monochromatic_energy
+    path_length_max: float
 
-    max_path_length: float
-
-    precision: float
+    path_length_precision: float, default = 0.0
 
     constant_bias: float, default = 0.0
-
 
     Returns
     -------
@@ -33,12 +30,18 @@ class BeamHardeningCorrector(DataProcessor):
 
     # Understand that the user may not be aware of the max path length in anything
     # apart from centre slice too (can we get from data?)
+    #
+    # Maybe set it as None by default and estimate max path length by estimating
+    # path length of slice with
+    #
+    # Add options for strength - weak, medium, strong
+    # Add option to determine automatic optimal linear curve automatically
     def __init__(
         self,
         polynomial_coefficients: np.ndarray,
         linear_attenuation_coefficient: float,
-        max_path_length: float,
-        precision: float,
+        path_length_max: float,
+        path_length_precision: float = 0.01,
         *,
         constant_bias: float = 0.0,
     ):
@@ -46,14 +49,21 @@ class BeamHardeningCorrector(DataProcessor):
         kwargs = {
             "polynomial_coefficients": polynomial_coefficients,
             "linear_attenuation_coefficient": linear_attenuation_coefficient,
-            "max_path_length": max_path_length,
-            "precision": precision,
+            "path_length_max": path_length_max,
+            "path_length_precision": path_length_precision,
             "constant_bias": constant_bias,
         }
         super().__init__(**kwargs)
 
     def check_input(self, data):
-        # make sure to check whether data is aq or recon
+        if self.polynomial_coefficients is None:
+            poly_coeff_msg = "Please provide polynomial coefficient list"
+            raise ValueError(poly_coeff_msg)
+
+        if not isinstance(data, AcquisitionData):
+            aq_format_msg = f"Expected AcquistionData, found {type(data)}"
+            raise TypeError(aq_format_msg)
+
         return True
 
     def process(self, out=None):
@@ -66,19 +76,17 @@ class BeamHardeningCorrector(DataProcessor):
             out.fill(data.as_array())
             arr = out.as_array()
 
-        number_of_samples = int(self.max_path_length / self.precision)
+        number_of_samples = int(self.path_length_max / self.path_length_precision)
 
-        poly_x_values = np.linspace(0, self.max_path_length, number_of_samples)
+        poly_x_values = np.linspace(0, self.path_length_max, number_of_samples)
         poly_y_values = np.polynomial.polynomial.polyval(
             poly_x_values, self.polynomial_coefficients
         )
 
-        # true_x_value = np.interp(data, poly_y_values, poly_x_values)
         true_x_value = np.interp(arr, poly_y_values, poly_x_values)
 
-        # TODO add constant_bias() here
-        arr = self.linear_attenuation_coefficient * true_x_value + self.constant_bias
-        # np.multiply(self.linear_attenuation_coefficient, true_x_value, out=arr)
+        np.multiply(self.linear_attenuation_coefficient, true_x_value, out=arr)
+        arr += self.constant_bias
 
         out.fill(arr)
 
