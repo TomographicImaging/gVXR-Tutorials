@@ -15,8 +15,12 @@
 #
 #   Authored by:    Franck Vidal (UKRI-STFC)
 
+from collections.abc import Iterator
+from operator import attrgetter
+from typing import NamedTuple
 
 import numpy as np
+import numpy.polynomial.polynomial as poly
 from gvxrPython3 import gvxr
 from gvxrPython3.utils import (
     applyFiltration,
@@ -157,3 +161,64 @@ def find_optimal_stepwedge_size(
             upper_bound = mid_value
 
     return -1
+
+
+class PolynomialFit(NamedTuple):
+    """
+    Named tuple containing Polynomial fit related metrics.
+
+    Attributes
+    ----------
+    order : int
+        The order of the polynomial.
+    coefficients : np.ndarray
+        The array of polynomial coefficients.
+    curve : np.ndarray
+        The curve values themselves (y-axis points for the input x-values).
+    rmse : float
+        The root mean square error value of the fit against the input values.
+    """
+
+    order: int
+    coefficients: np.ndarray
+    curve: np.ndarray
+    rmse: float
+
+
+def _get_poly_fit_metrics(
+    x: np.ndarray,
+    y: np.ndarray,
+    max_order: int,
+) -> Iterator[PolynomialFit]:
+    for order in range(1, max_order + 1):
+        coefficients = poly.polyfit(x, y, order)
+        fit_values = poly.polyval(x, coefficients)
+        rmse = float(np.sqrt(np.mean((y - fit_values) ** 2)))
+
+        yield PolynomialFit(order, coefficients, fit_values, rmse)
+
+
+def get_optimal_poly_fit(
+    x: list | np.ndarray,
+    y: list | np.ndarray,
+    max_order: int,
+) -> PolynomialFit:
+    """Return the curve optimally fitting inputted curve.
+
+    The optimal curve is obtained by comparing several polynomial fits (based
+    on the ``max_order`` value input) and outputting one with the least root
+    mean square error.
+
+    Parameters
+    ----------
+    x: ndarray
+        x-coordinates of the polynomial curve to be fitted.
+    y: ndarray
+        y-coordinates of the polynomial curve to be fitted.
+    max_order: int
+        The maximum order of the polynomial to fit against
+    """
+    x = np.asarray(x)
+    y = np.asarray(y)
+
+    return min(_get_poly_fit_metrics(x, y, max_order), key=attrgetter("rmse"))
