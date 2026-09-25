@@ -3,9 +3,10 @@ channels:
     - conda-forge
     - https://software.repos.intel.com/python/conda
     - ccpi
-    - pytorch
+#    - pytorch
     - nvidia
 dependencies:
+    - python=3.11
     - ipyevents
     - ipympl
     - ipywidgets
@@ -14,7 +15,6 @@ dependencies:
     - mpl-interactions
     - numpy
     - pandas
-    - python=3.11
     - SimpleITK
     - cil
     - ccpi-regulariser
@@ -22,18 +22,21 @@ dependencies:
     - tigre
     - progressbar
     - k3d
+    - tifffile
+    - setuptools==80.9.0
 #    - python-dotenv
 #    - pytorch-cuda
 #    - torchvision
-    - keras
-    - protobuf
-    - tensorflow-gpu
-    - fsspec
+#    - keras
+#    - protobuf
+#    - tensorflow-gpu
+#    - fsspec
 #    - opencv
     - pip
     - pip:
         - opengate
         - viewscad
-#        - gvxr>=2.0.11
-        - git+git://git.code.sf.net/p/gvirtualxray/gitroot
-        - segmentation-models
+        - spekpy
+        - gvxr>=2.1.1
+        - #git+git://git.code.sf.net/p/gvirtualxray/gitroot
+        - #segmentation-models
