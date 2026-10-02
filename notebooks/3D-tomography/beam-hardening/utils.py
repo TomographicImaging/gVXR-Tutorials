@@ -32,9 +32,8 @@ def setPolySpectrum(
     tube_voltage_kV: float,
     filters=None,
     tube_angle_in_deg: float = 12,
-    mAs=None,
     unit="keV",
-) -> dict:
+) -> tuple:
     """Create a polychromatic spectrum.
 
     Create a polychromatic spectum using ``gvxr.utils.loadSpectrum``
@@ -48,8 +47,6 @@ def setPolySpectrum(
         represented by a list containing ``[<material>, <thickness>, <unit>]``.
     tube_angle_in_deg: float, default=12
         The X-ray tube angle used for the creation of the spectrum.
-    mAs
-        The exposure in milliampere second.
     unit: str, default="keV"
         The unit of energy.
 
@@ -62,10 +59,7 @@ def setPolySpectrum(
     gvxr.setVoltage(tube_voltage_kV, "kV")
     gvxr.setTubeAngle(tube_angle_in_deg)
 
-    if mAs:
-        gvxr.setmAs(mAs)
-    else:
-        gvxr.setmAs(-1)
+    gvxr.addInherentFilter("C", 8.0, "mm")
 
     if filters:
         applyFiltration(filters)
@@ -74,7 +68,7 @@ def setPolySpectrum(
     photon_count = np.array(gvxr.getPhotonCountsPerCm2At1m(), dtype=np.single)
     photon_count /= (photon_count * energy_bins).sum()
 
-    return loadSpectrum(energy_bins, photon_count, unit, False)
+    return energy_bins, photon_count
 
 
 def makeHollowCylinder(
@@ -117,7 +111,11 @@ def transmission_to_absorption(data, tol=1e-9):
 
 
 def find_optimal_stepwedge_size(
-    data: np.ndarray, material: str, tolerance: float, max_iterations: int = 50
+    data: np.ndarray,
+    material: str,
+    tolerance: float,
+    max_iterations: int = 50,
+    unit: str = "mm",
 ):
     """Binary search to find the optimal stepwedge height.
 
@@ -126,10 +124,10 @@ def find_optimal_stepwedge_size(
     data: ndarray
         The data of the sinorgam corresponding to the reconstruction.
     """
-    detector_length, detector_width = gvxr.getDetectorSize("mm")
+    detector_length, detector_width = gvxr.getDetectorSize(unit)
 
     lower_bound = 0
-    upper_bound = gvxr.getSourceDetectorDistance("mm")
+    upper_bound = gvxr.getSourceDetectorDistance(unit)
 
     target = data.max()
 
@@ -137,7 +135,13 @@ def find_optimal_stepwedge_size(
         gvxr.removePolygonMeshesFromSceneGraph()
         mid_value = (upper_bound + lower_bound) * 0.5
 
-        gvxr.makeCuboid("bin_search_couboid", mid_value, detector_length, detector_width, "mm")
+        gvxr.makeCuboid(
+            "bin_search_couboid",
+            mid_value,
+            detector_length,
+            detector_width,
+            unit,
+        )
         gvxr.addPolygonMeshAsOuterSurface("bin_search_couboid")
         gvxr.setElement("bin_search_couboid", material)
 
@@ -147,9 +151,66 @@ def find_optimal_stepwedge_size(
         )
 
         neg_log_projection = transmission_to_absorption(projection)
-        max_projection = (
-            neg_log_projection.max()
-        )  # Should always be equal to 1 (unless the sample is larger)
+        max_projection = neg_log_projection.max()
+
+        if abs(max_projection - target) <= tolerance:
+            return mid_value
+
+        if max_projection < target - tolerance:
+            lower_bound = mid_value
+
+        else:
+            upper_bound = mid_value
+
+    return -1
+
+
+def find_optimal_stepwedge_size_mixture(
+    data: np.ndarray,
+    material_elements: str,
+    material_weights: str,
+    material_density: str,
+    tolerance: float,
+    unit: str = "mm",
+    max_iterations: int = 50,
+):
+    """Binary search to find the optimal stepwedge height.
+
+    Parameters
+    ----------
+    data: ndarray
+        The data of the sinorgam corresponding to the reconstruction.
+    """
+    detector_length, detector_width = gvxr.getDetectorSize(unit)
+
+    lower_bound = 0
+    upper_bound = gvxr.getSourceDetectorDistance(unit)
+
+    target = data.max()
+
+    for _ in range(max_iterations):
+        gvxr.removePolygonMeshesFromSceneGraph()
+        mid_value = (upper_bound + lower_bound) * 0.5
+
+        gvxr.makeCuboid(
+            "bin_search_couboid",
+            mid_value,
+            detector_length,
+            detector_width,
+            unit,
+        )
+        gvxr.addPolygonMeshAsOuterSurface("bin_search_couboid")
+
+        gvxr.setMixture("bin_search_couboid", material_elements, material_weights)
+        gvxr.setDensity("bin_search_couboid", material_density, "g.cm-3")
+
+        projection = (
+            np.array(gvxr.computeXRayImage(), dtype=np.single)
+            / gvxr.getTotalEnergyWithDetectorResponse()
+        )
+
+        neg_log_projection = transmission_to_absorption(projection)
+        max_projection = neg_log_projection.max()
 
         if abs(max_projection - target) <= tolerance:
             return mid_value
