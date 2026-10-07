@@ -22,10 +22,7 @@ from typing import NamedTuple
 import numpy as np
 import numpy.polynomial.polynomial as poly
 from gvxrPython3 import gvxr
-from gvxrPython3.utils import (
-    applyFiltration,
-    loadSpectrum,
-)
+from gvxrPython3.utils import applyFiltration
 
 
 def setPolySpectrum(
@@ -59,7 +56,7 @@ def setPolySpectrum(
     gvxr.setVoltage(tube_voltage_kV, "kV")
     gvxr.setTubeAngle(tube_angle_in_deg)
 
-    gvxr.addInherentFilter("C", 8.0, "mm")
+    gvxr.addInherentFilter("C", 4.0, "mm")
 
     if filters:
         applyFiltration(filters)
@@ -125,14 +122,18 @@ def find_optimal_stepwedge_size(
         The data of the sinorgam corresponding to the reconstruction.
     """
     detector_length, detector_width = gvxr.getDetectorSize(unit)
-
     lower_bound = 0
     upper_bound = gvxr.getSourceDetectorDistance(unit)
+    target = data.max()  # This is not an amazing value but is the easiest to work with for now.
 
-    target = data.max()
+    is_point_source = str(gvxr.getSourceShape()).lower() == "point"
+
+    if is_point_source:
+        gvxr.useParallelBeam()  # It is easier to work with parallel beam for this task
 
     for _ in range(max_iterations):
         gvxr.removePolygonMeshesFromSceneGraph()
+
         mid_value = (upper_bound + lower_bound) * 0.5
 
         gvxr.makeCuboid(
@@ -154,6 +155,8 @@ def find_optimal_stepwedge_size(
         max_projection = neg_log_projection.max()
 
         if abs(max_projection - target) <= tolerance:
+            if is_point_source:
+                gvxr.usePointSource()
             return mid_value
 
         if max_projection < target - tolerance:
@@ -162,6 +165,8 @@ def find_optimal_stepwedge_size(
         else:
             upper_bound = mid_value
 
+    if is_point_source:
+        gvxr.usePointSource()
     return -1
 
 
@@ -182,11 +187,14 @@ def find_optimal_stepwedge_size_mixture(
         The data of the sinorgam corresponding to the reconstruction.
     """
     detector_length, detector_width = gvxr.getDetectorSize(unit)
-
     lower_bound = 0
     upper_bound = gvxr.getSourceDetectorDistance(unit)
-
     target = data.max()
+
+    is_point_source = str(gvxr.getSourceShape()).lower() == "point"
+
+    if is_point_source:
+        gvxr.useParallelBeam()  # It is easier to work with parallel beam for this task
 
     for _ in range(max_iterations):
         gvxr.removePolygonMeshesFromSceneGraph()
@@ -213,6 +221,8 @@ def find_optimal_stepwedge_size_mixture(
         max_projection = neg_log_projection.max()
 
         if abs(max_projection - target) <= tolerance:
+            if is_point_source:
+                gvxr.usePointSource()
             return mid_value
 
         if max_projection < target - tolerance:
@@ -221,6 +231,8 @@ def find_optimal_stepwedge_size_mixture(
         else:
             upper_bound = mid_value
 
+    if is_point_source:
+        gvxr.usePointSource()
     return -1
 
 
