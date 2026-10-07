@@ -110,7 +110,7 @@ def transmission_to_absorption(data, tol=1e-9):
 def find_optimal_stepwedge_size(
     data: np.ndarray,
     material: str,
-    tolerance: float,
+    tolerance: float,  # tolerance for value instead of zero
     max_iterations: int = 50,
     unit: str = "mm",
 ):
