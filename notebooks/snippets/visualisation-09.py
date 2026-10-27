@@ -1,21 +1,18 @@
-# Display the normal vectors of the sample in the 3D visualisation
+# 1. Show the normal vectors of the sample in the 3D visualisation
 gvxr.displayNormalVectors(True)
 
-# Show the 3D objects in wireframe mode
+# 2. Display the 3D objects in wireframe mode
 gvxr.useWireframe(True)
 
-# Do not show the beam
-gvxr.displayBeam(False)
-
-# Update the visualisation
+# 3. Update the visualisationb
 gvxr.showWindow()
 gvxr.displayScene()
 
-# Take a screenshot
+# 4. Take a screenshot
 screenshot = gvxr.takeScreenshot()
 gvxr.hideWindow()
 
-# Display it using Matplotlib
+# 5. Display it using Matplotlib
 plt.figure(figsize=(10, 10))
 plt.imshow(screenshot)
 plt.title("Screenshot of the X-ray simulation environment")
