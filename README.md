@@ -105,6 +105,30 @@ We also shows how to plot the corresponding energy response. <a href="https://co
 - Laminography:
 - Helical CT scans:
 
+## Artefacts in CT images
+
+- Radial sampling/Number of projections
+  - [multi_material-CT_scan-RAM.ipynb (exercice)](notebooks/multi_material-CT_scan-RAM.ipynb)
+  - [multi_material-CT_scan-RAM.ipynb (solutions)](notebooks/multi_material-CT_scan-RAM.ipynb)
+  - [multi_material-CT_scan-disk.ipynb (exercice)](notebooks/multi_material-CT_scan-disk.ipynb)
+  - [multi_material-CT_scan-disk.ipynb (solutions)](notebooks/multi_material-CT_scan-disk.ipynb)
+
+
+- Cone-beam / partial volume effect
+  - [multi_material-CT_scan-RAM.ipynb (exercice)](notebooks/multi_material-CT_scan-RAM.ipynb)
+  - [multi_material-CT_scan-RAM.ipynb (solutions)](notebooks/multi_material-CT_scan-RAM.ipynb)
+  - [multi_material-CT_scan-disk.ipynb (exercice)](notebooks/multi_material-CT_scan-disk.ipynb)
+  - [multi_material-CT_scan-disk.ipynb (solutions)](notebooks/multi_material-CT_scan-disk.ipynb)
+  - [multi_material-reproducing_CT_scan-JSON_file.ipynb (exercice)](notebooks/multi_material-reproducing_CT_scan-JSON_file.ipynb)
+  - [multi_material-reproducing_CT_scan-JSON_file.ipynb (solutions)](notebooks/multi_material-reproducing_CT_scan-JSON_file.ipynb)
+
+- Low dose
+  - [multi_material-CT_scan-low_dose.ipynb (exercice)](notebooks/multi_material-CT_scan-low_dose.ipynb)
+
+- Photon starvation
+  - [multi_material-reproducing_CT_scan-JSON_file.ipynb (exercice)](notebooks/multi_material-reproducing_CT_scan-JSON_file.ipynb)
+  - [multi_material-reproducing_CT_scan-JSON_file.ipynb (solutions)](notebooks/multi_material-reproducing_CT_scan-JSON_file.ipynb)
+
 
 ## How to find help
 
