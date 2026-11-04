@@ -21,7 +21,7 @@ import os
 import numpy as np
 
 import urllib.request
-import progressbar
+# import progressbar
 import zipfile
 
 from gvxrPython3 import gvxr
@@ -47,21 +47,22 @@ def downloadLungman():
     zip_fname = os.path.join(lungman_path, "lungman_data.zip");
 
     if not os.path.exists(zip_fname):
-        def show_progress(block_num, block_size, total_size):
-            global pbar
-            if pbar is None:
-                pbar = progressbar.ProgressBar(maxval=total_size)
-                pbar.start()
-        
-            downloaded = block_num * block_size
-            if downloaded < total_size:
-                pbar.update(downloaded)
-            else:
-                pbar.finish()
-                pbar = None
+        # def show_progress(block_num, block_size, total_size):
+        #     global pbar
+        #     if pbar is None:
+        #         pbar = progressbar.ProgressBar(maxval=total_size)
+        #         pbar.start()
+        #
+        #     downloaded = block_num * block_size
+        #     if downloaded < total_size:
+        #         pbar.update(downloaded)
+        #     else:
+        #         pbar.finish()
+        #         pbar = None
                 
         print("Download the file (%s) from %s\n" % (zip_fname, zip_file_url))
-        urllib.request.urlretrieve(zip_file_url, zip_fname, show_progress)
+        # urllib.request.urlretrieve(zip_file_url, zip_fname, show_progress)
+        urllib.request.urlretrieve(zip_file_url, zip_fname)
 
     return zip_fname, lungman_path, mesh_path, CT_path
 
