@@ -1,2 +1,2 @@
-print("Zoom:", gvxr.getZoom())
-print("Transformation matrix:", gvxr.getSceneRotationMatrix())
+print("Eye position:", gvxr.getCameraPosition("cm"))
+print("Target position:", gvxr.getCameraReferencePoint("cm"))

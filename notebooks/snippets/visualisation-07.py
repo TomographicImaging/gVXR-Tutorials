@@ -1,5 +1,6 @@
-# Change the opacity
-gvxr.setZoom(200)
+# Change the positions
+gvxr.setCameraPosition(3, 60.0, 0.0, "cm")
+gvxr.setCameraReferencePoint(3, 0.0, 0.0, "cm")
 
 # Do not show the beam
 gvxr.displayBeam(False)
