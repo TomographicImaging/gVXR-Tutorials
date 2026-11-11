@@ -35,10 +35,10 @@ dependencies:
 #    - opencv
     - pip
     - pip:
-        - "gvxr==2.1.0"
         - opengate
         - viewscad
         - spekpy
-        - gvxr>=2.1.1
-        - #git+git://git.code.sf.net/p/gvirtualxray/gitroot
-        - #segmentation-models
+        - "gvxr==2.1.0"
+        # - gvxr>=2.1.1
+        # - git+git://git.code.sf.net/p/gvirtualxray/gitroot
+        # - segmentation-models
